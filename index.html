@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8c78bd"><title>Hair routine</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#f7f4fc;--card:#fff;--ink:#30283d;--muted:#81778f;--line:#ece6f5;--lav:#8c78bd;--lav2:#e9e1f6;--deep:#66518f;--pink:#f2e5f3;--shadow:0 8px 28px #57427c12}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:25px 20px 18px;background:linear-gradient(135deg,#eee7fa,#f9f2fb);border-radius:0 0 26px 26px}
+h1{font-size:27px;margin:0;color:#594779;letter-spacing:-.5px}header p{margin:5px 0 0;color:var(--muted)}
+main{max-width:850px;margin:auto;padding:16px 14px 100px}
+.tabs{display:flex;gap:8px;overflow:auto;padding:3px 0 14px}
+.tab{border:0;border-radius:20px;background:#fff;color:var(--deep);padding:10px 14px;white-space:nowrap;font-weight:600}
+.tab.active{background:var(--lav);color:white}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin:0 0 13px;box-shadow:var(--shadow)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h2{font-size:19px;margin:0 0 12px;color:#594779}h3{font-size:16px;margin:0 0 6px}
+button,.btn{border:0;border-radius:13px;background:var(--lav);color:#fff;padding:10px 14px;font:600 14px system-ui;cursor:pointer}
+button.secondary{background:var(--lav2);color:var(--deep)}button.ghost{background:transparent;color:var(--deep);padding:7px}
+input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fdfcff;color:var(--ink);font:14px system-ui;margin:5px 0 10px}
+textarea{min-height:76px;resize:vertical}label{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dayname,.day{min-width:0;text-align:center}.dayname{font-size:11px;color:var(--muted);padding:6px 0}
+.day{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;min-height:57px;padding:5px 1px;font-weight:600}
+.day.muted{opacity:.32}.day.today{outline:2px solid var(--lav)}.day.selected{background:var(--lav2);border-color:var(--lav)}
+.dot{display:block;width:6px;height:6px;background:#967fc8;border-radius:50%;margin:4px auto 0}.day small{display:block;font-size:10px;color:var(--deep);font-weight:500}
+.monthtitle{font-size:17px;font-weight:700;color:#594779}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.item{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}
+.thumb{width:54px;height:54px;border-radius:13px;background:var(--lav2);object-fit:cover;display:grid;place-items:center;color:var(--deep);font-size:22px;flex-shrink:0}
+.iteminfo{flex:1;min-width:0}.iteminfo p{margin:2px 0;color:var(--muted);font-size:12px}
+.pill{display:inline-block;border-radius:20px;padding:4px 9px;background:var(--lav2);color:var(--deep);font-size:11px;margin:2px}
+.empty{color:var(--muted);text-align:center;padding:20px 8px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}.actions button{font-size:12px;padding:7px 10px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:12px}
+@media(min-width:650px){main{padding-left:24px;padding-right:24px}.calendar-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.day{min-height:68px}}
+</style></head>
+<body>
+<header><h1>✿ Hair routine</h1><p>Твой нежный дневник ухода за волосами</p></header>
+<main>
+<nav class="tabs">
+<button class="tab active" data-tab="calendar">Календарь</button><button class="tab" data-tab="products">Мои средства</button><button class="tab" data-tab="history">История</button><button class="tab" data-tab="notes">Заметки</button><button class="tab" data-tab="settings">Напоминания</button>
+</nav>
+<section id="calendar" class="panel active">
+<div class="calendar-layout">
+<div class="card">
+<div class="row"><button class="secondary" id="prev">‹</button><div class="monthtitle" id="monthLabel"></div><button class="secondary" id="next">›</button></div>
+<div class="grid" id="calendarGrid" style="margin-top:12px"></div>
+</div>
+<div>
+<div class="card"><h2 id="selectedTitle">Выбранный день</h2><div id="dayDetails" class="empty">Выбери день в календаре, чтобы добавить процедуру.</div></div>
+<div class="card"><h2>Быстрая отметка</h2>
+<label>Тип процедуры</label><select id="procedureType"><option>Мытьё головы</option><option>Маска</option><option>Бальзам / кондиционер</option><option>Пилинг кожи головы</option><option>Несмываемый уход</option><option>Другое</option></select>
+<label>Использованные средства</label><select id="procedureProducts" multiple size="4"></select>
+<label>Заметка</label><textarea id="procedureNote" placeholder="Например: волосы мягкие, маска понравилась..."></textarea>
+<button id="saveProcedure">Сохранить процедуру</button>
+</div></div></div>
+</section>
+<section id="products" class="panel">
+<div class="card"><h2>Добавить средство</h2>
+<label>Название</label><input id="productName" placeholder="Например, шампунь Raywell">
+<div class="formgrid"><div><label>Категория</label><select id="productCategory"><option>Шампунь</option><option>Бальзам / кондиционер</option><option>Маска</option><option>Несмываемый уход</option><option>Пилинг</option><option>Масло / сыворотка</option><option>Другое</option></select></div><div><label>Дата покупки (необязательно)</label><input id="productDate" type="date"></div></div>
+<label>Фото средства</label><input id="productPhoto" type="file" accept="image/*">
+<label>Заметка</label><input id="productDesc" placeholder="Для чего использую, впечатления...">
+<button id="addProduct">Добавить в список</button></div>
+<div class="card"><h2>Моя полочка</h2><div id="productList" class="empty">Пока нет добавленных средств.</div></div>
+</section>
+<section id="history" class="panel"><div class="card"><h2>История процедур</h2><div id="historyList" class="empty">Здесь будут сохраняться все процедуры.</div></div></section>
+<section id="notes" class="panel"><div class="card"><h2>Дневник волос</h2><label>Дата</label><input type="date" id="noteDate"><label>Как чувствуют себя волосы?</label><textarea id="noteText" placeholder="Например: после мытья волосы гладкие, кожа головы комфортная..."></textarea><button id="saveNote">Сохранить заметку</button></div><div class="card"><h2>Мои записи</h2><div id="notesList" class="empty">Записей пока нет.</div></div></section>
+<section id="settings" class="panel"><div class="card"><h2>Напоминания</h2><p style="color:var(--muted);font-size:13px">Можно включить уведомление в поддерживаемом браузере. Для надёжной работы уведомлений приложение нужно установить с защищённого сайта (HTTPS).</p><label>Напоминать о мытье головы каждые</label><select id="reminderDays"><option value="2">2 дня</option><option value="3" selected>3 дня</option><option value="4">4 дня</option><option value="5">5 дней</option><option value="7">7 дней</option></select><label>Время напоминания</label><input type="time" id="reminderTime" value="10:00"><button id="enableNotifications">Включить уведомления</button><p id="notificationStatus" style="font-size:12px;color:var(--muted)"></p></div>
+<div class="card"><h2>Данные приложения</h2><p style="font-size:13px;color:var(--muted)">Записи и фотографии сохраняются в памяти этого браузера на планшете. Не очищай данные браузера, если хочешь сохранить дневник.</p><button class="secondary" id="exportData">Скачать резервную копию</button></div></section>
+<footer>Hair routine · твой личный календарь ухода ♡</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id), key='hairRoutineDataV1';
+let data=JSON.parse(localStorage.getItem(key)||'{"products":[],"procedures":[],"notes":[]}');
+let view=new Date();view.setDate(1);let selected=new Date();selected.setHours(0,0,0,0);
+const save=()=>localStorage.setItem(key,JSON.stringify(data));
+const iso=d=>{let x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+const pretty=s=>new Date(s+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active');render()});
+$('prev').onclick=()=>{view.setMonth(view.getMonth()-1);renderCalendar()};$('next').onclick=()=>{view.setMonth(view.getMonth()+1);renderCalendar()};
+function renderCalendar(){let y=view.getFullYear(),m=view.getMonth();$('monthLabel').textContent=view.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});let first=new Date(y,m,1),offset=(first.getDay()+6)%7,start=new Date(y,m,1-offset);let g=$('calendarGrid');g.innerHTML='';['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].forEach(n=>{let e=document.createElement('div');e.className='dayname';e.textContent=n;g.append(e)});for(let i=0;i<42;i++){let d=new Date(start);d.setDate(start.getDate()+i);let s=iso(d),events=data.procedures.filter(p=>p.date===s);let b=document.createElement('button');b.className='day'+(d.getMonth()!==m?' muted':'')+(s===iso(new Date())?' today':'')+(s===iso(selected)?' selected':'');b.innerHTML=`${d.getDate()}${events.length?'<span class="dot"></span><small>'+events.length+' '+(events.length===1?'запись':'записи')+'</small>':''}`;b.onclick=()=>{selected=d;renderCalendar();renderDay()};g.append(b)}renderDay()}
+function renderDay(){let s=iso(selected);$('selectedTitle').textContent=pretty(s);let list=data.procedures.filter(p=>p.date===s);$('dayDetails').innerHTML=list.length?list.map(p=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><b>${esc(p.type)}</b><p style="font-size:12px;color:var(--muted)">${(p.products||[]).map(esc).join(', ')||'Средства не указаны'}</p>${p.note?'<p>'+esc(p.note)+'</p>':''}<button class="ghost" onclick="deleteProcedure('${p.id}')">Удалить</button></div>`).join(''):'<div class="empty">Пока нет процедур. Добавь запись ниже ♡</div>';let sel=$('procedureProducts');sel.innerHTML=data.products.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('')}
+$('saveProcedure').onclick=()=>{let type=$('procedureType').value,products=[...$('procedureProducts').selectedOptions].map(o=>o.value),note=$('procedureNote').value.trim();data.procedures.push({id:crypto.randomUUID(),date:iso(selected),type,products,note});save();$('procedureNote').value='';render()};
+window.deleteProcedure=id=>{data.procedures=data.procedures.filter(p=>p.id!==id);save();render()};
+$('addProduct').onclick=()=>{let name=$('productName').value.trim();if(!name){alert('Введи название средства');return}let file=$('productPhoto').files[0],reader=new FileReader();reader.onload=()=>{data.products.push({id:crypto.randomUUID(),name,category:$('productCategory').value,date:$('productDate').value,desc:$('productDesc').value.trim(),photo:reader.result||''});save();['productName','productDate','productDesc','productPhoto'].forEach(id=>$(id).value='');render()};if(file)reader.readAsDataURL(file);else{reader.onload();}};
+window.deleteProduct=id=>{if(confirm('Удалить средство?')){data.products=data.products.filter(p=>p.id!==id);save();render()}};
+function renderProducts(){$('productList').innerHTML=data.products.length?data.products.map(p=>`<div class="item"><div class="thumb">${p.photo?`<img src="${p.photo}" style="width:54px;height:54px;object-fit:cover;border-radius:13px">`:'✿'}</div><div class="iteminfo"><b>${esc(p.name)}</b><p>${esc(p.category)}${p.date?' · '+pretty(p.date):''}</p>${p.desc?`<p>${esc(p.desc)}</p>`:''}</div><button class="ghost" onclick="deleteProduct('${p.id}')">✕</button></div>`).join(''):'<div class="empty">Пока нет добавленных средств.</div>'}
+function renderHistory(){$('historyList').innerHTML=data.procedures.length?[...data.procedures].sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="item"><div class="thumb">♡</div><div class="iteminfo"><b>${esc(p.type)}</b><p>${pretty(p.date)} · ${(p.products||[]).map(esc).join(', ')}</p>${p.note?`<p>${esc(p.note)}</p>`:''}</div></div>`).join(''):'<div class="empty">Здесь будут сохраняться все процедуры.</div>'}
+$('noteDate').value=iso(new Date());$('saveNote').onclick=()=>{let note=$('noteText').value.trim();if(!note){alert('Добавь текст заметки');return}data.notes.push({id:crypto.randomUUID(),date:$('noteDate').value,text:note});save();$('noteText').value='';render()};
+function renderNotes(){$('notesList').innerHTML=data.notes.length?[...data.notes].sort((a,b)=>b.date.localeCompare(a.date)).map(n=>`<div class="item"><div class="iteminfo"><b>${pretty(n.date)}</b><p>${esc(n.text)}</p></div><button class="ghost" onclick="deleteNote('${n.id}')">✕</button></div>`).join(''):'<div class="empty">Записей пока нет.</div>'}
+window.deleteNote=id=>{data.notes=data.notes.filter(n=>n.id!==id);save();render()};
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){renderCalendar();renderProducts();renderHistory();renderNotes()}
+$('enableNotifications').onclick=async()=>{if(!('Notification'in window)){$('notificationStatus').textContent='Этот браузер не поддерживает уведомления.';return}let p=await Notification.requestPermission();$('notificationStatus').textContent=p==='granted'?'Разрешение получено. Для регулярных уведомлений понадобится установленная версия с поддержкой фоновых задач.':'Разрешение не предоставлено.';if(p==='granted')new Notification('Hair routine',{body:'Уведомления разрешены ♡'})};
+$('exportData').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hair-routine-backup.json';a.click();URL.revokeObjectURL(a.href)};
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+render();
+</script></body></html>
